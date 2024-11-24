@@ -54,7 +54,7 @@ public class UserService {
     }
 
     public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         return convertToDto(user);
     }
 
@@ -62,4 +62,25 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public UserDto patchUser(Long id, UserDto user) {
+        UserDto existingUser = getUserById(id);
+        if (user.getFirstName() != null) {
+            existingUser.setFirstName(user.getFirstName());
+        }
+        if (user.getLastName() != null) {
+            existingUser.setLastName(user.getLastName());
+        }
+        if (user.getEmail() != null) {
+            existingUser.setEmail(user.getEmail());
+        }
+        return createUser(existingUser);
+    }
+
+    public UserDto updateUser(Long id, UserDto user) {
+        UserDto existingUser = getUserById(id);
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setEmail(user.getEmail());
+        return createUser(existingUser);
+    }
 }

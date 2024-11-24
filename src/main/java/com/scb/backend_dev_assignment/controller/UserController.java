@@ -48,4 +48,15 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto user) {
+        UserDto updatedUser = userService.updateUser(id, user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserDto> patchUser(@PathVariable Long id, @RequestBody UserDto user) {
+        UserDto updatedUser = userService.patchUser(id, user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
 }
