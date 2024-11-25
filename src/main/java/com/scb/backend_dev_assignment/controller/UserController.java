@@ -5,6 +5,7 @@ import com.scb.backend_dev_assignment.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,16 +21,10 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(@Validated @RequestBody UserDto userDto) {
         UserDto createdUser = userService.createUser(userDto);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
-
-//    @PostMapping
-//    public ResponseEntity<List<UserDto>> createUsers(@RequestBody List<UserDto> usersDto) {
-//        List<UserDto> createdUsers = userService.createUser(usersDto);
-//        return new ResponseEntity<>(createdUsers, HttpStatus.CREATED);
-//    }
 
     @GetMapping
     public List<UserDto> getAllUsers() {
