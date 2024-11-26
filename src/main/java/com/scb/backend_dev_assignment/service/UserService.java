@@ -2,6 +2,7 @@ package com.scb.backend_dev_assignment.service;
 
 import com.scb.backend_dev_assignment.dto.UserDto;
 import com.scb.backend_dev_assignment.entity.User;
+import com.scb.backend_dev_assignment.exception.QueryNotFoundException;
 import com.scb.backend_dev_assignment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class UserService {
     }
 
     public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        User user = userRepository.findById(id).orElseThrow(() -> new QueryNotFoundException("User not found with id: " + id));
         return convertToDto(user);
     }
 
@@ -82,5 +83,10 @@ public class UserService {
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
         return createUser(existingUser);
+    }
+
+    public List<UserDto> getUserByAge(int age) {
+        List<User> users = userRepository.findByAge(age);
+        return convertToDto(users);
     }
 }
