@@ -2,17 +2,20 @@ package com.scb.backend_dev_assignment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scb.backend_dev_assignment.dto.UserDto;
+import com.scb.backend_dev_assignment.exception.QueryNotFoundException;
 import com.scb.backend_dev_assignment.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -60,6 +63,18 @@ public class UserControllerTest {
     }
 
     @Test
+    void createUser_ShouldReturnErrorValidation() throws Exception {
+        UserDto userRequestDto = new UserDto(null, null, "Hatake", null);
+
+        mockMvc.perform(post("/api/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRequestDto)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.firstName").value("must not be null"))
+                .andExpect(jsonPath("$.errType").value("MethodArgumentNotValidException"));
+    }
+
+    @Test
     void getUserById_ShouldReturnUser() throws Exception {
         Long id = 1L;
         UserDto userDto = new UserDto(id, "Kakashi", "Hatake", null);
@@ -69,6 +84,17 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(userDto.getId()))
                 .andExpect(jsonPath("$.firstName").value(userDto.getFirstName()))
                 .andExpect(jsonPath("$.lastName").value(userDto.getLastName()));
+    }
+
+    @Test
+    void getUserById_ShouldReturnQueryNotFoundException() throws Exception {
+        Long id = 1L;
+        String errMsg = "User not found with id: " + id;
+        Mockito.when(userService.getUserById(id)).thenThrow(new QueryNotFoundException(errMsg));
+        mockMvc.perform(get("/api/user/{id}", id))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errType").value("QueryNotFoundException"))
+                .andExpect(jsonPath("$.errMsg").value(errMsg));
     }
 
     @Test
@@ -122,5 +148,16 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].id").value(userDto.getId()))
                 .andExpect(jsonPath("$[0].firstName").value(userDto.getFirstName()))
                 .andExpect(jsonPath("$[0].lastName").value(userDto.getLastName()));
+    }
+
+    @Test
+    void getUserByAge_ShouldReturnInvalidDataAccessResourceUsageException() throws Exception {
+        String errMsg = "Invalid statement";
+        Mockito.when(userService.getUserByAge(anyInt())).thenThrow(new InvalidDataAccessResourceUsageException((errMsg)));
+
+        mockMvc.perform(get("/api/user/age/{age}", anyInt()))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.errType").value("InvalidDataAccessResourceUsageException"))
+                .andExpect(jsonPath("$.errMsg").value(errMsg));
     }
 }

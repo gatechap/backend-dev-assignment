@@ -33,17 +33,6 @@ public class UserService {
         return new User(userDto.getId(), userDto.getFirstName(), userDto.getLastName(), userDto.getEmail());
     }
 
-    private List<User> convertToEntity(List<UserDto> usersDto) {
-        List<User> users = new ArrayList<>();
-        usersDto.forEach(userDto -> users.add(convertToEntity(userDto)));
-        return users;
-    }
-
-    public List<UserDto> createUser(List<UserDto> usersDto) {
-        List<User> users = convertToEntity(usersDto);
-        return convertToDto(userRepository.saveAll(users));
-    }
-
     public UserDto createUser(UserDto userDto) {
         User user = convertToEntity(userDto);
         User savedUser = userRepository.save(user);
