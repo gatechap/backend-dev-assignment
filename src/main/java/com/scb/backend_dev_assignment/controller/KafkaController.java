@@ -1,5 +1,7 @@
 package com.scb.backend_dev_assignment.controller;
 
+import com.scb.backend_dev_assignment.dto.KafkaRequestDto;
+import com.scb.backend_dev_assignment.dto.KafkaResponseDto;
 import com.scb.backend_dev_assignment.service.KafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +17,8 @@ public class KafkaController {
     private KafkaService kafkaService;
 
     @PostMapping("/publish")
-    public String publish(@RequestBody String message) {
-        kafkaService.produce(message);
-        return "Message sent to Kafka Topic";
+    public KafkaResponseDto publish(@RequestBody KafkaRequestDto kafkaRequestDto) {
+        kafkaService.produce(kafkaRequestDto);
+        return new KafkaResponseDto("success");
     }
 }
-
