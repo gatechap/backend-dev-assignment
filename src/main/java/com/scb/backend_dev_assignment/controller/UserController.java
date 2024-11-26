@@ -54,4 +54,10 @@ public class UserController {
         UserDto updatedUser = userService.patchUser(id, user);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
+
+    @GetMapping("/age/{age}")
+    public ResponseEntity<List<UserDto>> getUserByAge(@PathVariable int age) {
+        List<UserDto> users = userService.getUserByAge(age);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
 }
