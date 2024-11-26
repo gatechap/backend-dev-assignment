@@ -1,5 +1,6 @@
 package com.scb.backend_dev_assignment.service;
 
+import com.scb.backend_dev_assignment.dto.KafkaRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,13 +15,13 @@ public class KafkaService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public void produce(String message) {
-        kafkaTemplate.send(TOPIC, message);
+    public void produce(KafkaRequestDto kafkaRequestDto) {
+        kafkaTemplate.send(kafkaRequestDto.getTopic(), kafkaRequestDto.getMessage());
     }
 
     @KafkaListener(topics = TOPIC, groupId = GROUP_ID)
-    public void consume(String message) {
-        System.out.println("Received Message: " + message);
+    public void consumeMyTopic(String message) {
+        System.out.println("Received Message: /n" + message);
     }
 }
 
